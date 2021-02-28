@@ -1,7 +1,8 @@
 resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
   Resolver.sbtPluginRepo("releases"),
-  Resolver.jcenterRepo
+  Resolver.jcenterRepo,
+  Resolver.mavenLocal
 )
 
 ThisBuild / scalaVersion := "2.13.4"
@@ -33,6 +34,8 @@ lazy val root = (project in file("."))
       Dependencies.metricsApi,
       Dependencies.metricsScala,
       Dependencies.metricsStatsd,
+      "cz.jenda.cats-micrometer" %% "cats-micrometer-core" % "0.1.0-SNAPSHOT",
+      "com.avast" %% "sst-micrometer-statsd" % "0.6.2",
       // testing
       Dependencies.scalaTest % Test
     )
