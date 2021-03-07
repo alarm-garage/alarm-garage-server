@@ -4,9 +4,6 @@ object Dependencies {
   val config = "com.typesafe" % "config" % "1.4.0"
   val fs2 = "co.fs2" %% "fs2-core" % Versions.fs2
   val logback = "ch.qos.logback" % "logback-classic" % "1.2.3"
-  val metricsApi = "com.avast.metrics" % "metrics-api" % Versions.metrics
-  val metricsStatsd = "com.avast.metrics" % "metrics-statsd" % Versions.metrics
-  val metricsScala = "com.avast.metrics" %% "metrics-scala" % Versions.metrics
   val monix = "io.monix" % "monix_2.13" % "3.3.0"
   val mqttClient = "net.sigusr" %% "fs2-mqtt" % "0.4.2"
   val pureconfig = "com.github.pureconfig" %% "pureconfig" % "0.14.0"

@@ -31,9 +31,8 @@ lazy val root = (project in file("."))
       Dependencies.slog4sSlf4j,
       Dependencies.logback,
       // metrics
-      Dependencies.metricsApi,
-      Dependencies.metricsScala,
-      Dependencies.metricsStatsd,
+      "cz.jenda.cats-micrometer" %% "cats-micrometer-core" % "0.1.0-SNAPSHOT",
+      "com.avast" %% "sst-micrometer-statsd" % "0.6.2",
       "cz.jenda.cats-micrometer" %% "cats-micrometer-core" % "0.1.0-SNAPSHOT",
       "com.avast" %% "sst-micrometer-statsd" % "0.6.2",
       // testing

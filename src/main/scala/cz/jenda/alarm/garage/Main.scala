@@ -1,27 +1,20 @@
 package cz.jenda.alarm.garage
 
 import cats.effect.ExitCode
-import com.avast.metrics.scalaapi.Monitor
-import com.avast.metrics.statsd.StatsDMetricsMonitor
 import com.avast.sst.micrometer.statsd.{MicrometerStatsDConfig, MicrometerStatsDModule}
-import cz.jenda.cats.micrometer.DefaultCatsEffectMeterRegistry
+import cz.jenda.cats.micrometer.DefaultCatsMeterRegistry
 import io.micrometer.core.instrument.config.NamingConvention
 import monix.eval.{Task, TaskApp}
 import net.sigusr.mqtt.api.Message
 import protocol.alarm.{Report, State}
 import slog4s.slf4j.Slf4jFactory
 
-import java.time.{Duration, LocalDateTime, ZoneId, ZoneOffset}
-import java.util.concurrent.Executors
+import java.time.{Duration, LocalDateTime, ZoneOffset}
 import java.util.concurrent.atomic.{AtomicInteger, AtomicReference}
-import scala.util.control.NonFatal
 import scala.concurrent.duration._
+import scala.util.control.NonFatal
 
 object Main extends TaskApp {
-  private lazy val monitor = Monitor(
-    new StatsDMetricsMonitor("statsd.jenda.eu", 8125, "test.garage", Duration.ofSeconds(30), Executors.newScheduledThreadPool(1))
-  )
-
   private lazy val lastState: AtomicReference[Option[State]] = new AtomicReference(None)
 
   private val totalTime = new AtomicReference[Double](0)
@@ -37,7 +30,7 @@ object Main extends TaskApp {
 
     val program = for {
       metricsRegistry <- MicrometerStatsDModule.make[Task](statsDConfig, namingConvention = Some(NamingConvention.dot))
-      metrics <- DefaultCatsEffectMeterRegistry.wrap(metricsRegistry)
+      metrics <- DefaultCatsMeterRegistry.wrap(metricsRegistry)
       sub <- MqttModule.make(config.mqtt, loggerFactory.make("MqttSubscription"), processMessage)
     } yield {
       (metrics, sub)
