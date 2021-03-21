@@ -4,6 +4,8 @@ import pureconfig.generic.ProductHint
 import pureconfig.generic.auto._
 import pureconfig.{CamelCase, ConfigFieldMapping, ConfigSource}
 
+import scala.concurrent.duration.FiniteDuration
+
 case class AppConfiguration(mqtt: MqttConfiguration)
 
 object AppConfiguration {
@@ -14,4 +16,15 @@ object AppConfiguration {
   }
 }
 
-case class MqttConfiguration(host: String, port: Int, topic: String, subscriberName: String)
+case class MqttConfiguration(
+    host: String,
+    port: Int,
+    ssl: Boolean,
+    user: Option[String],
+    pass: Option[String],
+    topic: String,
+    subscriberName: String,
+    readTimeout: FiniteDuration,
+    connectionRetries: Int,
+    keepAliveSecs: Int
+)
