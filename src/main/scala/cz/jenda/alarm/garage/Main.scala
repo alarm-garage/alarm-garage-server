@@ -13,9 +13,12 @@ import scala.util.control.NonFatal
 object Main extends TaskApp {
   private lazy val lastState: AtomicReference[Option[State]] = new AtomicReference(None)
 
-  private val totalTime = new AtomicReference[Double](0)
-  private val totalTimeCount = new AtomicInteger()
-  private val totalEventsCount = new AtomicInteger()
+  private lazy val totalTime = new AtomicReference[Double](0)
+  private lazy val totalTimeCount = new AtomicInteger()
+  private lazy val totalEventsCount = new AtomicInteger()
+
+  private lazy val loggerFactory = Slf4jFactory[Task].withoutContext.loggerFactory
+  private lazy val logger = loggerFactory.make[Main.type]
 
   override def run(args: List[String]): Task[ExitCode] = {
     val config = AppConfiguration.load
@@ -23,13 +26,13 @@ object Main extends TaskApp {
     val loggerFactory = Slf4jFactory[Task].withoutContext.loggerFactory
 
     val program = for {
-      sub <- MqttModule.make(config.mqtt, loggerFactory.make("MqttSubscription"), processMessage)
+      _ <- MqttModule.make(config.mqtt, loggerFactory.make("MqttSubscription"), processMessage)
     } yield {
-      sub
+      ()
     }
 
-    program.use { sub =>
-      sub.connectAndAwait *> Task.never[ExitCode]
+    program.use { _ =>
+      Task.never[ExitCode]
     }
   }
 
@@ -59,9 +62,8 @@ object Main extends TaskApp {
       if (totalTimeCount.get() > 0 && totalTimeCount.get() % 20 == 0) {
         println(s"AVG diff: ${totalTime.get() / totalTimeCount.get()}s")
       }
-    }.onErrorRecover {
-      case NonFatal(e) =>
-        e.printStackTrace()
+    }.onErrorRecoverWith {
+      case NonFatal(e) => logger.warn(e, "Failure while processing the message:")
     } *> Task.unit
   }
 }
